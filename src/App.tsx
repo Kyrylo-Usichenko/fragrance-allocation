@@ -79,6 +79,7 @@ function App() {
 					</select>
 				</div>
 				<div>
+					<label htmlFor='family'>Family: </label>
 					<select
 						id='families'
 						value={family}
@@ -91,6 +92,7 @@ function App() {
 				</div>
 				{setExists && (
 					<div>
+						<label htmlFor='description'>Description: </label>
 						<select
 							name=''
 							id=''
