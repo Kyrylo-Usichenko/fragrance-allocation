@@ -1,53 +1,40 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './styles/index.css';
+import { ingredientGroups, sets } from './utils/families';
 
-type Gender = 'male' | 'female' | 'unisex';
+type Gender = 'feminine' | 'masculine' | 'unisex';
 
 function App() {
-	const [gender, setGender] = useState<Gender>('female');
-	const [word1, setWord1] = useState<string>('Sparkling');
-	const [word2, setWord2] = useState<string>('Juicy');
-	const [word3, setWord3] = useState<string>('Cheerful');
-	const [families, setFamilies] = useState<string[]>(['FLORAL']);
+	const [gender, setGender] = useState<Gender>('feminine');
+
+	const [family, setFamily] = useState<any>(ingredientGroups[0].family);
 	const [result, setResult] = useState<any>(null);
+	const [description, setDescription] = useState<any>('');
 	function handleChange(event: any) {
 		setGender(event.target.value.toLowerCase());
 	}
+	console.log(description);
 
-	function handleFamilyChange(e: any, i: number) {
-		const newFamilies = [...families];
-		// if this i exists, update it
-		if (newFamilies[i]) {
-			newFamilies[i] = e.target.value;
-			setFamilies(newFamilies);
-			return;
-		}
-		// otherwise, add it
-		newFamilies[i] = e.target.value;
-		setFamilies(newFamilies);
-	}
-
-	function handleDeleteFamily(i: number) {
-		const newFamilies = [...families];
-		newFamilies.splice(i, 1);
-		setFamilies(newFamilies);
-	}
-
-	function handleAddFamily() {
-		const newFamilies = [...families];
-		newFamilies.push('');
-		setFamilies(newFamilies);
+	function handleFamilyChange(e: any) {
+		setFamily(e.target.value);
 	}
 
 	async function handleSubmit() {
-		const words = [word1, word2, word3].filter((word) => word !== '');
-		const lastFamilies = families.filter((family) => family !== '');
+		let gend = 'male';
+		if (gender === 'feminine') {
+			gend = 'female';
+		}
+		if (gender === 'unisex') {
+			gend = 'unisex';
+		}
 		try {
 			const body = {
-				gender,
-				description: words,
-				familyPreference: lastFamilies,
+				gender: gend,
+				familyPreference: [family],
+				description: description.split(','),
 			};
+			console.log(body);
+
 			const res = await fetch('https://api.scentcraft.ai/allocator', {
 				method: 'POST',
 				headers: {
@@ -64,6 +51,20 @@ function App() {
 		}
 	}
 
+	const setExists = useMemo(() => {
+		const array = sets.filter((set) => set.family.includes(family));
+		const newArray = array.filter((set) => set.gender.includes(gender));
+		return newArray.length > 0;
+	}, [family, gender]);
+
+	useEffect(() => {
+		if (sets.some((set) => set.family.includes(family))) {
+			const array = sets.filter((set) => set.family.includes(family));
+			const newArray = array.filter((set) => set.gender.includes(gender));
+			setDescription(newArray[0].description);
+		}
+	}, [family, gender, setExists]);
+
 	return (
 		<>
 			<div className='wrapper'>
@@ -74,51 +75,51 @@ function App() {
 						onChange={handleChange}
 						value={gender}
 					>
-						<option value='female'>Female</option>
-						<option value='male'>Male</option>
+						<option value='feminine'>Female</option>
+						<option value='masculine'>Male</option>
 						<option value='unisex'>Unisex</option>
 					</select>
 				</div>
 				<div>
-					{families.map((family, i: number) => (
-						<div key={i}>
-							<input
-								value={family}
-								type='text'
-								onChange={(e) => handleFamilyChange(e, i)}
-							/>
-							{families.length > 1 && i !== 0 && (
-								<button onClick={() => handleDeleteFamily(i)}>Delete</button>
-							)}
+					<select
+						id='families'
+						value={family}
+						onChange={handleFamilyChange}
+					>
+						{ingredientGroups.map((f, i) => {
+							return <option key={i}>{f.family}</option>;
+						})}
+					</select>
+				</div>
+				{setExists && (
+					<div>
+						<select
+							name=''
+							id=''
+							value={description}
+							onChange={(e) => setDescription(e.target.value)}
+						>
+							{sets.map((set, i) => {
+								if (set.family.includes(family)) {
+									if (set.gender.includes(gender)) {
+										return (
+											<option
+												key={i}
+												value={set.description}
+											>
+												{set.description.join(', ')}
+											</option>
+										);
+									}
+								}
+							})}
+						</select>
+						<div>
+							<button onClick={handleSubmit}>Send</button>
 						</div>
-					))}
-					{families.length < 3 && <button onClick={handleAddFamily}>Add one more family</button>}
-				</div>
-				<div>
-					<p>Description word 1:</p>
-					<input
-						type='text'
-						value={word1}
-						onChange={(e) => setWord1(e.target.value)}
-					/>
-				</div>
-				<div>
-					<p>Description word 2:</p>
-					<input
-						type='text'
-						value={word2}
-						onChange={(e) => setWord2(e.target.value)}
-					/>
-				</div>
-				<div>
-					<p>Description word 3:</p>
-					<input
-						type='text'
-						value={word3}
-						onChange={(e) => setWord3(e.target.value)}
-					/>
-				</div>
-				<button onClick={handleSubmit}>Send</button>
+					</div>
+				)}
+
 				{result && !result.message && (
 					<div>
 						your result:
