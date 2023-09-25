@@ -27,14 +27,13 @@ function App() {
 		if (gender === 'unisex') {
 			gend = 'unisex';
 		}
+
 		try {
 			const body = {
 				gender: gend,
 				familyPreference: [family],
-				description: description.split(','),
+				description: description,
 			};
-			console.log(body);
-
 			const res = await fetch('https://api.scentcraft.ai/allocator', {
 				method: 'POST',
 				headers: {
