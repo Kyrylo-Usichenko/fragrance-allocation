@@ -32,7 +32,7 @@ function App() {
 			const body = {
 				gender: gend,
 				familyPreference: [family],
-				description: description,
+				description: typeof description === 'string' ? description.split(',') : description,
 			};
 			const res = await fetch('https://api.scentcraft.ai/allocator', {
 				method: 'POST',
