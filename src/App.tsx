@@ -13,7 +13,6 @@ function App() {
 	function handleChange(event: any) {
 		setGender(event.target.value.toLowerCase());
 	}
-	console.log(description);
 
 	function handleFamilyChange(e: any) {
 		setFamily(e.target.value);
@@ -113,9 +112,11 @@ function App() {
 								}
 							})}
 						</select>
-						<div>
-							<button onClick={handleSubmit}>Send</button>
-						</div>
+					</div>
+				)}
+				{setExists && (
+					<div>
+						<button onClick={handleSubmit}>Send</button>
 					</div>
 				)}
 
