@@ -172,7 +172,7 @@ function App() {
 					</div>
 				)}
 				{!result?.message &&
-					result?.map((item, index) => (
+					result?.map((item: any, index: number) => (
 						<div
 							key={index}
 							className='result'
