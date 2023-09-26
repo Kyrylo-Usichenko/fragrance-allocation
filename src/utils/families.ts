@@ -1,264 +1,3 @@
-export const ingredientGroups = [
-	{
-		family: 'GREEN & AQUATIC',
-		background: '/images/ingredientgroup/green-aquatic.webp',
-		ingredients: [
-			{
-				ingredientName: 'Ocean',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/ocean.webp',
-			},
-			{
-				ingredientName: 'Green leaves',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/greenleaves.webp',
-			},
-			{
-				ingredientName: 'Green Tea',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/greentea.webp',
-			},
-		],
-	},
-	{
-		family: 'AROMATICS & CITRUS',
-		background: '/images/ingredientgroup/aromatic-citrus.webp',
-		ingredients: [
-			{
-				ingredientName: 'Lavender',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/lavender.webp',
-			},
-			{
-				ingredientName: 'Sage',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/sage.webp',
-			},
-			{
-				ingredientName: 'Pine Needle / Juniper Berry',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/pineneedles.webp',
-			},
-			{
-				ingredientName: 'Bergamot',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/bergamot.webp',
-			},
-			{
-				ingredientName: 'Citrus',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/citrus.webp',
-			},
-		],
-	},
-	{
-		family: 'FLORAL',
-		background: '/images/ingredientgroup/floral.webp',
-		ingredients: [
-			{
-				ingredientName: 'Jasmine Sambac',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/jasminesambac.webp',
-			},
-			{
-				ingredientName: 'Turkish Rose',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/turkishrose.webp',
-			},
-			{
-				ingredientName: 'Tuberose Absolute',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/tuberoseabsolute.webp',
-			},
-			{
-				ingredientName: 'Orange Flower',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/orangeflower.webp',
-			},
-			{
-				ingredientName: 'Black Lily',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/blacklily.webp',
-			},
-			{
-				ingredientName: 'Muguet',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/muguet.webp',
-			},
-			{
-				ingredientName: 'Frangipani',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/frangipani.webp',
-			},
-			{
-				ingredientName: 'Ylang Ylang',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/ylang.webp',
-			},
-			{
-				ingredientName: 'Violet',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/violet.webp',
-			},
-			{
-				ingredientName: 'Orris / Powder',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/orris.webp',
-			},
-		],
-	},
-	{
-		family: 'FRUITY',
-		background: '/images/ingredientgroup/fruity.webp',
-		ingredients: [
-			{
-				ingredientName: 'Peach / Apricot',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/peach.webp',
-			},
-			{
-				ingredientName: 'Raspberry',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/raspberry.webp',
-			},
-			{
-				ingredientName: 'APPLE/PEAR',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/apple.webp',
-			},
-			{
-				ingredientName: 'Fig',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/fig.webp',
-			},
-			{
-				ingredientName: 'Black Currant',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/blackcurrant.webp',
-			},
-			{
-				ingredientName: 'Pineapple',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/pineapple.webp',
-			},
-		],
-	},
-	{
-		family: 'GOURMAND',
-		background: '/images/ingredientgroup/gourmand.webp',
-		ingredients: [
-			{
-				ingredientName: 'Vanilla',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/vanilla.webp',
-			},
-			{
-				ingredientName: 'Amber',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/amber.webp',
-			},
-			{
-				ingredientName: 'Sesame',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/sesame.webp',
-			},
-			{
-				ingredientName: 'Praline & Chocolate',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/praline.webp',
-			},
-		],
-	},
-	{
-		family: 'SPICES',
-		background: '/images/ingredientgroup/spices.webp',
-		ingredients: [
-			{
-				ingredientName: 'Incense/Myrrh',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/incense.webp',
-			},
-			{
-				ingredientName: 'Black Pepper',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/blackpepper.webp',
-			},
-			{
-				ingredientName: 'Pink Pepper',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/pinkpepper.webp',
-			},
-			{
-				ingredientName: 'Cinnamon',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/cinnamon.webp',
-			},
-			{
-				ingredientName: 'Cardamon',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/cardamon.webp',
-			},
-			{
-				ingredientName: 'Cumin, Ginger & Nutmeg',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/nutmeg.webp',
-			},
-			{
-				ingredientName: 'Black Tea',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/blacktea.webp',
-			},
-		],
-	},
-	{
-		family: 'WOODY',
-		background: '/images/ingredientgroup/woody.webp',
-		ingredients: [
-			{
-				ingredientName: 'Patchouli',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/patchouli.webp',
-			},
-			{
-				ingredientName: 'Vetiver',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/vetiver.webp',
-			},
-			{
-				ingredientName: 'Sandalwood',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/sandalwood.webp',
-			},
-			{
-				ingredientName: 'Cedarwood',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/cedarwood.webp',
-			},
-			{
-				ingredientName: 'Oud',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/oud.webp',
-			},
-		],
-	},
-	{
-		family: 'ANIMALIC',
-		background: '/images/ingredientgroup/animalic.webp',
-		ingredients: [
-			{
-				ingredientName: 'Leather',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/leather.webp',
-			},
-			{
-				ingredientName: 'Musk',
-				ingredientImage:
-					'https://scentcraft.s3-us-west-2.amazonaws.com/webassets/ingredients/musk.webp',
-			},
-		],
-	},
-];
-
 export const sets = [
 	{
 		family: 'FLORAL FRUITY',
@@ -3572,4 +3311,50 @@ export const sets = [
 		],
 		description: ['Elegant', 'Dandy', 'Seductive'],
 	},
+];
+
+export const families = [
+	'FLORAL FRUITY',
+	'FLORAL',
+	'FLORAL ALDEHYDE',
+	'ORIENTAL FLORAL',
+	'FLORAL WOODY MUSK',
+	'ORIENTAL WOODY',
+	'ORIENTAL VANILLA',
+	'AROMATIC SPICY',
+	'WOODY AROMATIC',
+	'GREEN FLORAL',
+	'FLORAL FRUITY GOURMAND',
+	'CITRUS AROMATIC',
+	'CHYPRE FLORAL',
+	'WOODY SPICY',
+	'ORIENTAL',
+	'ORIENTAL SPICY',
+	'CHYPRE FRUITY',
+	'AROMATIC',
+	'WOODY FLORAL MUSK',
+	'FLORAL AQUATIC',
+	'AROMATIC FOUGERE',
+	'LEATHER',
+	'WOODY',
+	'ORIENTAL FOUGERE',
+	'AROMATIC AQUATIC',
+	'WOODY AROMATIC',
+	'AROMATIC FRUITY',
+	'CITRUS',
+	'AROMATIC GREEN ',
+	'CHYPRE',
+	'WOODY CHYPRE',
+	'CITRUS GOURMAND',
+	'WOODY AQUATIC',
+];
+[
+	'Sparkling Juicy Cheerful',
+	'Oceanic Narcotic Precious',
+	'Feminine Elegant Playful',
+	'Wild Seductive Bold',
+	'Sparkling Sexy Spirited',
+	'Natural Crispy Delicious',
+	'Crisp Exhilarating Delicate',
+	'Delicious Joyful Natural',
 ];

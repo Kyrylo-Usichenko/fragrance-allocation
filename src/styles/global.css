@@ -67,10 +67,31 @@ button:focus-visible {
 	}
 }
 .wrapper {
-  width: 100%;
-  margin: 20px 0 0;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 20px;
+	width: 100%;
+	padding: 20px 0 0;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	gap: 20px;
+}
+.searchField {
+	width: 100%;
+	max-width: 450px;
+	height: 300px;
+	overflow: scroll;
+	border: 1px solid #ccc;
+	& div {
+		cursor: pointer;
+		&:hover {
+			background-color: #ccc;
+		}
+	}
+}
+.cardsWrapper {
+	& div {
+		cursor: pointer;
+	}
+}
+.result {
+	max-width: 300px;
 }

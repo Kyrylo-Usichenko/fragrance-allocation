@@ -1,24 +1,41 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import './styles/index.css';
-import { ingredientGroups, sets } from './utils/families';
+import { sets } from './utils/families';
 
-type Gender = 'feminine' | 'masculine' | 'unisex';
+// const families = sets
+// 	.map((set) => set.family)
+// 	.filter((value, index, self) => self.indexOf(value) === index);
 
 function App() {
-	const [gender, setGender] = useState<Gender>('feminine');
-
-	const [family, setFamily] = useState<any>(ingredientGroups[0].family);
+	const [gender, setGender] = useState<string>('feminine');
+	const [time, setTime] = useState('daylight');
+	const [type, setType] = useState('sexy');
+	const [search, setSearch] = useState('');
+	const [searchedFragrance, setSearchedFragrance] = useState<any>(null);
+	const [searchResults, setSearchResults] = useState<any>([]);
+	const [cards, setCards] = useState<any>([]);
+	const [fragrance, setFragrance] = useState<any>(null);
 	const [result, setResult] = useState<any>(null);
-	const [description, setDescription] = useState<any>('');
-	function handleChange(event: any) {
+	function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
 		setGender(event.target.value.toLowerCase());
 	}
+	const handleSearch = async (value: string) => {
+		setResult(null);
+		setCards([]);
+		try {
+			const response = await fetch(
+				`https://api.scentcraft.ai/fragrances?s=${value}&page=${1}&perPage=${9999}`
+			);
+			const data = await response.json();
+			const newFragrances = data.data.fragrances;
+			setSearchResults(newFragrances);
+		} catch (e) {
+			setSearchResults([]);
+		}
+	};
 
-	function handleFamilyChange(e: any) {
-		setFamily(e.target.value);
-	}
-
-	async function handleSubmit() {
+	const handleSubmit = useCallback(async () => {
 		let gend = 'male';
 		if (gender === 'feminine') {
 			gend = 'female';
@@ -30,9 +47,11 @@ function App() {
 		try {
 			const body = {
 				gender: gend,
-				familyPreference: [family],
-				description: typeof description === 'string' ? description.split(',') : description,
+				familyPreference: [fragrance?.family],
+				description: fragrance?.description,
 			};
+			console.log(body);
+
 			const res = await fetch('https://api.scentcraft.ai/allocator', {
 				method: 'POST',
 				headers: {
@@ -47,97 +66,131 @@ function App() {
 		} catch (error) {
 			setResult('No results');
 		}
-	}
-
-	const setExists = useMemo(() => {
-		const array = sets.filter((set) => set.family.includes(family));
-		const newArray = array.filter((set) => set.gender.includes(gender));
-		return newArray.length > 0;
-	}, [family, gender]);
+	}, [fragrance?.description, fragrance?.family, gender]);
 
 	useEffect(() => {
-		if (sets.some((set) => set.family.includes(family))) {
-			const array = sets.filter((set) => set.family.includes(family));
-			const newArray = array.filter((set) => set.gender.includes(gender));
-			setDescription(newArray[0].description);
-		}
-	}, [family, gender, setExists]);
+		if (!searchedFragrance) return;
+		let filteredSets = sets;
+		filteredSets = filteredSets
+			.filter((set) => set.family === searchedFragrance?.family.toUpperCase())
+			.map((set) => {
+				if (set.family === 'CHYPRE & WOODY CHYPRE & FLORAL CHYPRE (3 familes combined)') {
+					return {
+						...set,
+						family: 'WOODY CHYPRE',
+					};
+				}
+				if (set.family === 'WOODY AQUATIC & AROMATIC AQUATIC COMBINED') {
+					return {
+						...set,
+						family: 'WOODY AROMATIC',
+					};
+				}
+				return set;
+			});
 
+		if (gender) filteredSets = filteredSets.filter((set) => set.gender.includes(gender));
+		setCards(filteredSets);
+	}, [searchedFragrance, gender]);
+
+	useEffect(() => {
+		if (!fragrance) return;
+		handleSubmit();
+	}, [fragrance, handleSubmit]);
+	const isDebounced = useDebouncedCallback((value) => handleSearch(value), 500);
 	return (
 		<>
 			<div className='wrapper'>
 				<div>
-					<label htmlFor='gender'>Gender: </label>
+					<label>Gender: </label>
 					<select
-						id='gender'
 						onChange={handleChange}
 						value={gender}
 					>
-						<option value='feminine'>Female</option>
-						<option value='masculine'>Male</option>
+						<option value='feminine'>Feminine</option>
+						<option value='masculine'>Masculine</option>
 						<option value='unisex'>Unisex</option>
 					</select>
 				</div>
 				<div>
-					<label htmlFor='family'>Family: </label>
+					<label>Time: </label>
 					<select
-						id='families'
-						value={family}
-						onChange={handleFamilyChange}
+						onChange={(e) => setTime(e.target.value)}
+						value={time}
 					>
-						{ingredientGroups.map((f, i) => {
-							return <option key={i}>{f.family}</option>;
-						})}
+						<option value='feminine'>Daylight</option>
+						<option value='masculine'>Moonlight</option>
 					</select>
 				</div>
-				{setExists && (
-					<div>
-						<label htmlFor='description'>Description: </label>
-						<select
-							name=''
-							id=''
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
+				<div>
+					<label>Type: </label>
+					<select
+						onChange={(e) => setType(e.target.value)}
+						value={type}
+					>
+						<option value='Sexy'>Sexy</option>
+						<option value='Elegant'>Elegant</option>
+						<option value='Relaxed'>Relaxed</option>
+						<option value='Elegant'>Fresh</option>
+					</select>
+				</div>
+				<input
+					value={search}
+					type='text'
+					placeholder='Type your favourite fragrances'
+					onChange={(e) => {
+						isDebounced(e.target.value);
+						setSearch(e.target.value);
+					}}
+				/>
+				<div className='searchField'>
+					{searchResults?.map((fragrance: any, index: number) => (
+						<div
+							onClick={() => setSearchedFragrance(fragrance)}
+							key={index}
 						>
-							{sets.map((set, i) => {
-								if (set.family.includes(family)) {
-									if (set.gender.includes(gender)) {
-										return (
-											<option
-												key={i}
-												value={set.description}
-											>
-												{set.description.join(', ')}
-											</option>
-										);
-									}
-								}
-							})}
-						</select>
+							{fragrance.name}
+						</div>
+					))}
+				</div>
+				{searchedFragrance && (
+					<div>
+						<h3>Here is your fragrance family: {searchedFragrance.family}</h3>
 					</div>
 				)}
-				{setExists && (
-					<div>
-						<button onClick={handleSubmit}>Send</button>
+				{cards.length !== 0 && (
+					<div className='cardsWrapper'>
+						<h3>Pick your fragrance description:</h3>
+						{cards?.map((card: any, index: number) => (
+							<div
+								onClick={() => setFragrance(card)}
+								key={index}
+							>
+								{JSON.stringify(card.description)}
+							</div>
+						))}
 					</div>
 				)}
-
-				{result && !result.message && (
-					<div>
-						your result:
-						{typeof result === 'object' &&
-							result.map((item: any, i: any) => (
-								<div key={i}>
-									{Object.keys(item).map((key) => (
-										<p key={key}>
-											{JSON.stringify(key)}: {JSON.stringify(item[key])}
-										</p>
-									))}
+				{!result?.message &&
+					result?.map((item, index) => (
+						<div
+							key={index}
+							className='result'
+						>
+							<h3>Your fragrance is:</h3>
+							{/* map all result keys */}
+							{Object.keys(item).map((key, index) => (
+								<div key={index}>
+									{key}: {JSON.stringify(item[key])}
 								</div>
 							))}
+						</div>
+					))}
+				{result?.message && (
+					<div>
+						<h3>No results</h3>
 					</div>
 				)}
-				{result && result.message && <p>No results</p>}
 			</div>
 		</>
 	);
