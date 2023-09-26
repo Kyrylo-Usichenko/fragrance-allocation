@@ -17,10 +17,13 @@ function App() {
 	const [cards, setCards] = useState<any>([]);
 	const [fragrance, setFragrance] = useState<any>(null);
 	const [result, setResult] = useState<any>(null);
+	const [isSearching, setIsSearching] = useState(false);
+	const [isAllocation, setIsAllocation] = useState(false);
 	function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
 		setGender(event.target.value.toLowerCase());
 	}
 	const handleSearch = async (value: string) => {
+		setIsSearching(true);
 		setResult(null);
 		setCards([]);
 		try {
@@ -30,12 +33,15 @@ function App() {
 			const data = await response.json();
 			const newFragrances = data.data.fragrances;
 			setSearchResults(newFragrances);
+			setIsSearching(false);
 		} catch (e) {
 			setSearchResults([]);
+			setIsSearching(false);
 		}
 	};
 
 	const handleSubmit = useCallback(async () => {
+		setIsAllocation(true);
 		let gend = 'male';
 		if (gender === 'feminine') {
 			gend = 'female';
@@ -63,11 +69,12 @@ function App() {
 			if (!data.message) {
 				setResult(data.data);
 			}
+			setIsAllocation(false);
 		} catch (error) {
 			setResult('No results');
+			setIsAllocation(false);
 		}
 	}, [fragrance?.description, fragrance?.family, gender]);
-
 	useEffect(() => {
 		if (!searchedFragrance) return;
 		let filteredSets = sets;
@@ -97,6 +104,8 @@ function App() {
 		if (!fragrance) return;
 		handleSubmit();
 	}, [fragrance, handleSubmit]);
+	console.log(result);
+
 	const isDebounced = useDebouncedCallback((value) => handleSearch(value), 500);
 	return (
 		<>
@@ -136,6 +145,7 @@ function App() {
 				</div>
 				<input
 					value={search}
+					className='search'
 					type='text'
 					placeholder='Type your favourite fragrances'
 					onChange={(e) => {
@@ -144,30 +154,47 @@ function App() {
 					}}
 				/>
 				<div className='searchField'>
-					{searchResults?.map((fragrance: any, index: number) => (
-						<div
-							onClick={() => setSearchedFragrance(fragrance)}
-							key={index}
-						>
-							{fragrance.name}
+					{isSearching && (
+						<div className='lds-ring'>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
 						</div>
-					))}
+					)}
+					{!isSearching &&
+						searchResults?.map((fragrance: any, index: number) => (
+							<span
+								onClick={() => {
+									setSearchedFragrance(fragrance);
+									setResult(null);
+								}}
+								key={index}
+							>
+								{fragrance.name}
+							</span>
+						))}
 				</div>
 				{searchedFragrance && (
 					<div>
-						<h3>Here is your fragrance family: {searchedFragrance.family}</h3>
+						<h3>Here is your fragrance: </h3>
+						<h4>family: {searchedFragrance.family}</h4>
+						<h4>name: {searchedFragrance.name}</h4>
 					</div>
 				)}
 				{cards.length !== 0 && (
 					<div className='cardsWrapper'>
 						<h3>Pick your fragrance description:</h3>
 						{cards?.map((card: any, index: number) => (
-							<div
-								onClick={() => setFragrance(card)}
+							<button
+								onClick={() => {
+									setResult(null);
+									setFragrance(card);
+								}}
 								key={index}
 							>
-								{JSON.stringify(card.description)}
-							</div>
+								{JSON.stringify(card.description.join(' '))}
+							</button>
 						))}
 					</div>
 				)}
@@ -179,14 +206,40 @@ function App() {
 						>
 							<h3>Your fragrance is:</h3>
 							{/* map all result keys */}
-							{Object.keys(item).map((key, index) => (
-								<div key={index}>
-									{key}: {JSON.stringify(item[key])}
-								</div>
-							))}
+							<table>
+								<tbody>
+									<tr>
+										<th>Name:</th>
+										<td>{item.name}</td>
+									</tr>
+									<tr>
+										<th>Code:</th>
+										<td>{item.code}</td>
+									</tr>
+									<tr>
+										<th>Notes</th>
+										{/* item.notes is an object with fields, display it as a table */}
+										<td>
+											{Object.entries(item.notes).map(([key, value]) => (
+												<div key={key}>
+													<b>{key.toUpperCase()}</b>: {value}
+												</div>
+											))}
+										</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 					))}
-				{result?.message && (
+				{isAllocation && (
+					<div className='lds-ring'>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+					</div>
+				)}
+				{!isAllocation && result?.message && (
 					<div>
 						<h3>No results</h3>
 					</div>
