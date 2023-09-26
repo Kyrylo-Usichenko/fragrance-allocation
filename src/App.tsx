@@ -4,12 +4,11 @@ import { useDebouncedCallback } from 'use-debounce';
 import './styles/index.css';
 import { sets } from './utils/families';
 
-// const families = sets
-// 	.map((set) => set.family)
-// 	.filter((value, index, self) => self.indexOf(value) === index);
+const families = sets
+	.map((set) => set.family)
+	.filter((value, index, self) => self.indexOf(value) === index);
 
 function App() {
-	const [gender, setGender] = useState<string>('feminine');
 	const [time, setTime] = useState('daylight');
 	const [type, setType] = useState('sexy');
 	const [search, setSearch] = useState('');
@@ -22,9 +21,6 @@ function App() {
 	const [isAllocation, setIsAllocation] = useState(false);
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(0);
-	function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
-		setGender(event.target.value.toLowerCase());
-	}
 	const handleSearch = async (value: string) => {
 		setIsSearching(true);
 		setResult(null);
@@ -35,6 +31,16 @@ function App() {
 			);
 			const data = await response.json();
 			const newFragrances = data.data.fragrances;
+			const emptyFamily = newFragrances.filter((fragrance) => fragrance.family === '');
+
+			const withoutAnyGender = emptyFamily.filter(
+				(fragrance) => fragrance.female === true || fragrance.male === true
+			);
+			// console.log(emptyFamily);
+			// console.log(withAnyGender.map((fragrance) => fragrance.name));
+			// console.log(withoutAnyGender.map((fragrance) => fragrance));
+
+			// console.log(emptyFamily.map((fragrance) => fragrance.name));
 			const newLimit = data.data.total;
 			setPage(1);
 			setLimit(newLimit);
@@ -70,11 +76,11 @@ function App() {
 	const handleSubmit = useCallback(async () => {
 		setIsAllocation(true);
 		let gend = 'male';
-		if (gender === 'feminine') {
+		if (fragrance.female === true) {
 			gend = 'female';
-		}
-		if (gender === 'unisex') {
-			gend = 'unisex';
+			if (fragrance.male === true) {
+				gend = 'unisex';
+			}
 		}
 
 		try {
@@ -83,8 +89,6 @@ function App() {
 				familyPreference: [fragrance?.family],
 				description: fragrance?.description,
 			};
-			console.log(body);
-
 			const res = await fetch('https://api.scentcraft.ai/allocator', {
 				method: 'POST',
 				headers: {
@@ -93,15 +97,35 @@ function App() {
 				body: JSON.stringify(body),
 			});
 			const data = await res.json();
-			if (!data.message) {
+
+			if (data.status !== 'ERROR') {
 				setResult(data.data);
+				setIsAllocation(false);
+				return;
+			}
+			const bodyWithNewGender = {
+				gender: gend === 'male' ? 'female' : 'male',
+				familyPreference: [fragrance?.family],
+				description: fragrance?.description,
+			};
+			const resWithNewGender = await fetch('https://api.scentcraft.ai/allocator', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(bodyWithNewGender),
+			});
+			const dataWithNewGender = await resWithNewGender.json();
+			if (!dataWithNewGender.message) {
+				setResult(dataWithNewGender.data);
 			}
 			setIsAllocation(false);
 		} catch (error) {
-			setResult('No results');
+			setResult('No results found');
 			setIsAllocation(false);
 		}
-	}, [fragrance?.description, fragrance?.family, gender]);
+	}, [fragrance?.description, fragrance?.family, fragrance?.female, fragrance?.male]);
+
 	useEffect(() => {
 		if (!searchedFragrance) return;
 		let filteredSets = sets;
@@ -123,15 +147,20 @@ function App() {
 				return set;
 			});
 
-		if (gender) filteredSets = filteredSets.filter((set) => set.gender.includes(gender));
+		let gend = 'masculine';
+		if (searchedFragrance.female === true) {
+			gend = 'feminine';
+			if (searchedFragrance.male === true) {
+				gend = 'unisex';
+			}
+		}
+		filteredSets = filteredSets.filter((set) => set.gender.includes(gend));
 		setCards(filteredSets);
-	}, [searchedFragrance, gender]);
-
+	}, [searchedFragrance]);
 	useEffect(() => {
 		if (!fragrance) return;
 		handleSubmit();
 	}, [fragrance, handleSubmit]);
-
 	useEffect(() => {
 		handleSearch(search);
 	}, []);
@@ -141,10 +170,7 @@ function App() {
 			<div className='wrapper'>
 				<div>
 					<label>Choose your gender: </label>
-					<select
-						onChange={handleChange}
-						value={gender}
-					>
+					<select>
 						<option value='feminine'>Feminine</option>
 						<option value='masculine'>Masculine</option>
 						<option value='unisex'>Unisex</option>
@@ -203,7 +229,7 @@ function App() {
 						>
 							{!isSearching &&
 								searchResults?.map((fragrance: any, index: number) => (
-									<div
+									<span
 										onClick={() => {
 											setSearchedFragrance(fragrance);
 											setResult(null);
@@ -211,7 +237,7 @@ function App() {
 										key={index}
 									>
 										{fragrance.name}
-									</div>
+									</span>
 								))}
 						</InfiniteScroll>
 					)}

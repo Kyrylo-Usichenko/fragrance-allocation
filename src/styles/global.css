@@ -99,7 +99,9 @@ button:focus-visible {
 	height: 200px;
 	overflow: scroll;
 	border: 1px solid #ccc;
+
 	& span {
+		display: block;
 		cursor: pointer;
 		&:hover {
 			background-color: #ccc;
