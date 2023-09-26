@@ -222,7 +222,7 @@ function App() {
 										<td>
 											{Object.entries(item.notes).map(([key, value]) => (
 												<div key={key}>
-													<b>{key.toUpperCase()}</b>: {value}
+													<b>{key.toUpperCase()}</b>: {value as string}
 												</div>
 											))}
 										</td>
