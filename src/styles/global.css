@@ -44,8 +44,10 @@ h6 {
 	margin: 0;
 	padding: 0;
 }
-table, th, td {
-  border: 1px solid;
+table,
+th,
+td {
+	border: 1px solid;
 	padding: 5px;
 }
 button {
@@ -81,7 +83,7 @@ button:focus-visible {
 }
 .wrapper {
 	width: 100%;
-	padding: 20px 0 0;
+	padding: 20px 0;
 	display: flex;
 	align-items: center;
 	flex-direction: column;
@@ -153,4 +155,8 @@ button:focus-visible {
 	100% {
 		transform: rotate(360deg);
 	}
+}
+.searchInner {
+	display: flex;
+	flex-direction: column;
 }

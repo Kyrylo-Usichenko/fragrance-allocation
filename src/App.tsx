@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { useDebouncedCallback } from 'use-debounce';
 import './styles/index.css';
 import { sets } from './utils/families';
@@ -19,6 +20,8 @@ function App() {
 	const [result, setResult] = useState<any>(null);
 	const [isSearching, setIsSearching] = useState(false);
 	const [isAllocation, setIsAllocation] = useState(false);
+	const [page, setPage] = useState(1);
+	const [limit, setLimit] = useState(0);
 	function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
 		setGender(event.target.value.toLowerCase());
 	}
@@ -28,15 +31,39 @@ function App() {
 		setCards([]);
 		try {
 			const response = await fetch(
-				`https://api.scentcraft.ai/fragrances?s=${value}&page=${1}&perPage=${9999}`
+				`https://api.scentcraft.ai/fragrances?s=${value}&page=${1}&perPage=${10}`
 			);
 			const data = await response.json();
 			const newFragrances = data.data.fragrances;
+			const newLimit = data.data.total;
+			setPage(1);
+			setLimit(newLimit);
 			setSearchResults(newFragrances);
 			setIsSearching(false);
 		} catch (e) {
 			setSearchResults([]);
 			setIsSearching(false);
+		}
+	};
+
+	const handlePaginate = async () => {
+		setResult(null);
+		try {
+			const response = await fetch(
+				`https://api.scentcraft.ai/fragrances?s=${search}&page=${page}&perPage=${10}`
+			);
+			const data = await response.json();
+			const newFragrances = data.data.fragrances;
+			const newLimit = data.data.total;
+			setPage(page + 1);
+			setLimit(newLimit);
+			if (newFragrances.length === 0) {
+				setResult([]);
+				return;
+			}
+			setSearchResults([...searchResults, ...newFragrances]);
+		} catch (e) {
+			setSearchResults([]);
 		}
 	};
 
@@ -104,14 +131,16 @@ function App() {
 		if (!fragrance) return;
 		handleSubmit();
 	}, [fragrance, handleSubmit]);
-	console.log(result);
 
+	useEffect(() => {
+		handleSearch(search);
+	}, []);
 	const isDebounced = useDebouncedCallback((value) => handleSearch(value), 500);
 	return (
 		<>
 			<div className='wrapper'>
 				<div>
-					<label>Gender: </label>
+					<label>Choose your gender: </label>
 					<select
 						onChange={handleChange}
 						value={gender}
@@ -122,7 +151,7 @@ function App() {
 					</select>
 				</div>
 				<div>
-					<label>Time: </label>
+					<label>IT'S MOSTLY FOR: </label>
 					<select
 						onChange={(e) => setTime(e.target.value)}
 						value={time}
@@ -132,7 +161,7 @@ function App() {
 					</select>
 				</div>
 				<div>
-					<label>Type: </label>
+					<label>LETS MAKE IT: </label>
 					<select
 						onChange={(e) => setType(e.target.value)}
 						value={type}
@@ -143,6 +172,7 @@ function App() {
 						<option value='Elegant'>Fresh</option>
 					</select>
 				</div>
+				<h2>SELECT YOUR GO-TO FRAGRANCE</h2>
 				<input
 					value={search}
 					className='search'
@@ -162,18 +192,29 @@ function App() {
 							<div></div>
 						</div>
 					)}
-					{!isSearching &&
-						searchResults?.map((fragrance: any, index: number) => (
-							<span
-								onClick={() => {
-									setSearchedFragrance(fragrance);
-									setResult(null);
-								}}
-								key={index}
-							>
-								{fragrance.name}
-							</span>
-						))}
+					{!isSearching && searchResults && (
+						<InfiniteScroll
+							dataLength={searchResults.length}
+							next={handlePaginate}
+							hasMore={searchResults.length < limit / 10}
+							loader={<div />}
+							endMessage={<div />}
+							height={200}
+						>
+							{!isSearching &&
+								searchResults?.map((fragrance: any, index: number) => (
+									<div
+										onClick={() => {
+											setSearchedFragrance(fragrance);
+											setResult(null);
+										}}
+										key={index}
+									>
+										{fragrance.name}
+									</div>
+								))}
+						</InfiniteScroll>
+					)}
 				</div>
 				{searchedFragrance && (
 					<div>
