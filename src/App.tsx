@@ -4,9 +4,9 @@ import { useDebouncedCallback } from 'use-debounce';
 import './styles/index.css';
 import { sets } from './utils/families';
 
-const families = sets
-	.map((set) => set.family)
-	.filter((value, index, self) => self.indexOf(value) === index);
+// const families = sets
+// 	.map((set) => set.family)
+// 	.filter((value, index, self) => self.indexOf(value) === index);
 
 function App() {
 	const [time, setTime] = useState('daylight');
@@ -31,11 +31,11 @@ function App() {
 			);
 			const data = await response.json();
 			const newFragrances = data.data.fragrances;
-			const emptyFamily = newFragrances.filter((fragrance) => fragrance.family === '');
+			// const emptyFamily = newFragrances.filter((fragrance) => fragrance.family === '');
 
-			const withoutAnyGender = emptyFamily.filter(
-				(fragrance) => fragrance.female === true || fragrance.male === true
-			);
+			// const withoutAnyGender = emptyFamily.filter(
+			// 	(fragrance) => fragrance.female === true || fragrance.male === true
+			// );
 			// console.log(emptyFamily);
 			// console.log(withAnyGender.map((fragrance) => fragrance.name));
 			// console.log(withoutAnyGender.map((fragrance) => fragrance));
