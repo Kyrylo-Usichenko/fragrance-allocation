@@ -60,7 +60,6 @@ function App() {
 	};
 
 	const handlePaginate = async () => {
-		setResult(null);
 		try {
 			const response = await fetch(
 				`https://api.scentcraft.ai/fragrances?s=${search}&page=${page}&perPage=${10}`
