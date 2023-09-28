@@ -94,16 +94,29 @@ function App() {
 		if (searchedFragrance?.mainAccord !== '') {
 			finalFimaly = `${family},${mainAccord}`;
 		}
-		const secondaryDescriptions = cards.filter(
-			(desc: any) => JSON.stringify(desc) !== JSON.stringify(description)
-		);
+		let secondaryDescriptions: any;
+		if (cards.length === 1) {
+			secondaryDescriptions = [cards[0], cards[0]];
+		}
+		if (cards.length === 2) {
+			const anotherCards = cards.filter(
+				(card: any) => JSON.stringify(card) !== JSON.stringify(description)
+			);
+			secondaryDescriptions = [anotherCards[0], anotherCards[0]];
+		}
+		if (cards.length > 2) {
+			const anotherCards = cards.filter(
+				(desc: any) => JSON.stringify(desc) !== JSON.stringify(description)
+			);
+			secondaryDescriptions = shuffle(anotherCards).slice(0, 2);
+		}
 
 		try {
 			const body = {
 				gender: gend,
 				familyPreference: finalFimaly,
 				description: description,
-				secondaryDescriptions: shuffle(secondaryDescriptions).slice(0, 2),
+				secondaryDescriptions: secondaryDescriptions,
 			};
 			const res = await fetch(`${BASE_URL}/allocator`, {
 				method: 'POST',
