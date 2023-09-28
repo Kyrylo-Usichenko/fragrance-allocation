@@ -21,7 +21,7 @@ function App() {
 	const [limit, setLimit] = useState(0);
 	const [description, setDescription] = useState<any>(null);
 
-	function shuffle(array) {
+	function shuffle(array: any) {
 		let currentIndex = array.length,
 			randomIndex;
 
@@ -95,7 +95,7 @@ function App() {
 			finalFimaly = `${family},${mainAccord}`;
 		}
 		const secondaryDescriptions = cards.filter(
-			(desc) => JSON.stringify(desc) !== JSON.stringify(description)
+			(desc: any) => JSON.stringify(desc) !== JSON.stringify(description)
 		);
 
 		try {
