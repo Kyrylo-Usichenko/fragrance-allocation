@@ -6,8 +6,7 @@ import './styles/index.css';
 // const families = sets
 // 	.map((set) => set.family)
 // 	.filter((value, index, self) => self.indexOf(value) === index);
-// const BASE_URL = 'https://api.scentcraft.ai';
-const BASE_URL = 'https://44ec-92-52-130-71.ngrok-free.app';
+const BASE_URL = 'https://api.scentcraft.ai';
 function App() {
 	const [time, setTime] = useState('daylight');
 	const [type, setType] = useState('sexy');
