@@ -2,12 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useDebouncedCallback } from 'use-debounce';
 import './styles/index.css';
-import { sets } from './utils/families';
 
 // const families = sets
 // 	.map((set) => set.family)
 // 	.filter((value, index, self) => self.indexOf(value) === index);
-
+// const BASE_URL = 'https://api.scentcraft.ai';
+const BASE_URL = 'https://44ec-92-52-130-71.ngrok-free.app';
 function App() {
 	const [time, setTime] = useState('daylight');
 	const [type, setType] = useState('sexy');
@@ -15,12 +15,29 @@ function App() {
 	const [searchedFragrance, setSearchedFragrance] = useState<any>(null);
 	const [searchResults, setSearchResults] = useState<any>([]);
 	const [cards, setCards] = useState<any>([]);
-	const [fragrance, setFragrance] = useState<any>(null);
 	const [result, setResult] = useState<any>(null);
 	const [isSearching, setIsSearching] = useState(false);
 	const [isAllocation, setIsAllocation] = useState(false);
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(0);
+	const [description, setDescription] = useState<any>(null);
+
+	function shuffle(array) {
+		let currentIndex = array.length,
+			randomIndex;
+
+		// While there remain elements to shuffle.
+		while (currentIndex > 0) {
+			// Pick a remaining element.
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex--;
+
+			// And swap it with the current element.
+			[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+		}
+
+		return array;
+	}
 	const handleSearch = async (value: string) => {
 		setIsSearching(true);
 		setResult(null);
@@ -31,16 +48,6 @@ function App() {
 			);
 			const data = await response.json();
 			const newFragrances = data.data.fragrances;
-			// const emptyFamily = newFragrances.filter((fragrance) => fragrance.family === '');
-
-			// const withoutAnyGender = emptyFamily.filter(
-			// 	(fragrance) => fragrance.female === true || fragrance.male === true
-			// );
-			// console.log(emptyFamily);
-			// console.log(withAnyGender.map((fragrance) => fragrance.name));
-			// console.log(withoutAnyGender.map((fragrance) => fragrance));
-
-			// console.log(emptyFamily.map((fragrance) => fragrance.name));
 			const newLimit = data.data.total;
 			setPage(1);
 			setLimit(newLimit);
@@ -76,20 +83,30 @@ function App() {
 	const handleSubmit = useCallback(async () => {
 		setIsAllocation(true);
 		let gend = 'male';
-		if (fragrance.female === true) {
+		if (searchedFragrance.female === true) {
 			gend = 'female';
-			if (fragrance.male === true) {
+			if (searchedFragrance.male === true) {
 				gend = 'unisex';
 			}
 		}
+		const family = searchedFragrance.family;
+		const mainAccord = searchedFragrance.mainAccord.trim().replace(' ', ',');
+		let finalFimaly = family.trim();
+		if (searchedFragrance?.mainAccord !== '') {
+			finalFimaly = `${family},${mainAccord}`;
+		}
+		const secondaryDescriptions = cards.filter(
+			(desc) => JSON.stringify(desc) !== JSON.stringify(description)
+		);
 
 		try {
 			const body = {
 				gender: gend,
-				familyPreference: [fragrance?.family],
-				description: fragrance?.description,
+				familyPreference: finalFimaly,
+				description: description,
+				secondaryDescriptions: shuffle(secondaryDescriptions).slice(0, 2),
 			};
-			const res = await fetch('https://api.scentcraft.ai/allocator', {
+			const res = await fetch(`${BASE_URL}/allocator`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -103,64 +120,54 @@ function App() {
 				setIsAllocation(false);
 				return;
 			}
-			const bodyWithNewGender = {
-				gender: gend === 'male' ? 'female' : 'male',
-				familyPreference: [fragrance?.family],
-				description: fragrance?.description,
-			};
-			const resWithNewGender = await fetch('https://api.scentcraft.ai/allocator', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(bodyWithNewGender),
-			});
-			const dataWithNewGender = await resWithNewGender.json();
-			if (!dataWithNewGender.message) {
-				setResult(dataWithNewGender.data);
-			}
-			setIsAllocation(false);
 		} catch (error) {
 			setResult('No results found');
 			setIsAllocation(false);
 		}
-	}, [fragrance?.description, fragrance?.family, fragrance?.female, fragrance?.male]);
-
+	}, [
+		searchedFragrance?.female,
+		searchedFragrance?.family,
+		searchedFragrance?.mainAccord,
+		searchedFragrance?.description,
+		searchedFragrance?.male,
+		cards,
+		description,
+	]);
 	useEffect(() => {
 		if (!searchedFragrance) return;
-		let filteredSets = sets;
-		filteredSets = filteredSets
-			.filter((set) => set.family === searchedFragrance?.family.toUpperCase())
-			.map((set) => {
-				if (set.family === 'CHYPRE & WOODY CHYPRE & FLORAL CHYPRE (3 familes combined)') {
-					return {
-						...set,
-						family: 'WOODY CHYPRE',
-					};
-				}
-				if (set.family === 'WOODY AQUATIC & AROMATIC AQUATIC COMBINED') {
-					return {
-						...set,
-						family: 'WOODY AROMATIC',
-					};
-				}
-				return set;
-			});
 
-		let gend = 'masculine';
-		if (searchedFragrance.female === true) {
-			gend = 'feminine';
-			if (searchedFragrance.male === true) {
-				gend = 'unisex';
+		(async () => {
+			let gend = 'male';
+			if (searchedFragrance.female === true) {
+				gend = 'female';
+				if (searchedFragrance.male === true) {
+					gend = 'unisex';
+				}
 			}
-		}
-		filteredSets = filteredSets.filter((set) => set.gender.includes(gend));
-		setCards(filteredSets);
+			const family = searchedFragrance.family;
+			const mainAccord = searchedFragrance.mainAccord.trim().replace(' ', ',');
+			let finalFimaly = family.trim();
+			if (searchedFragrance?.mainAccord !== '') {
+				finalFimaly = `${family},${mainAccord}`;
+			}
+
+			const newCardsRes = await fetch(
+				`${BASE_URL}/fragrances/descriptions?gender=${gend}&families=${finalFimaly}`,
+				{
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				}
+			);
+			const newCards = await newCardsRes.json();
+			setCards(newCards.data.descriptions);
+		})();
 	}, [searchedFragrance]);
 	useEffect(() => {
-		if (!fragrance) return;
+		if (!description) return;
 		handleSubmit();
-	}, [fragrance, handleSubmit]);
+	}, [description, handleSubmit]);
 	useEffect(() => {
 		handleSearch(search);
 	}, []);
@@ -228,17 +235,20 @@ function App() {
 							height={200}
 						>
 							{!isSearching &&
-								searchResults?.map((fragrance: any, index: number) => (
-									<span
-										onClick={() => {
-											setSearchedFragrance(fragrance);
-											setResult(null);
-										}}
-										key={index}
-									>
-										{fragrance.name}
-									</span>
-								))}
+								searchResults?.map((fragrance: any, index: number) => {
+									if (fragrance.family !== '')
+										return (
+											<span
+												onClick={() => {
+													setSearchedFragrance(fragrance);
+													setResult(null);
+												}}
+												key={index}
+											>
+												{fragrance.name}
+											</span>
+										);
+								})}
 						</InfiniteScroll>
 					)}
 				</div>
@@ -256,22 +266,22 @@ function App() {
 							<button
 								onClick={() => {
 									setResult(null);
-									setFragrance(card);
+									setDescription(card);
 								}}
 								key={index}
 							>
-								{JSON.stringify(card.description.join(' '))}
+								{JSON.stringify(card.join(' '))}
 							</button>
 						))}
 					</div>
 				)}
 				{!result?.message &&
-					result?.map((item: any, index: number) => (
+					result?.mainScent?.map((item: any, index: number) => (
 						<div
 							key={index}
 							className='result'
 						>
-							<h3>Your fragrance is:</h3>
+							<h3>Your main fragrance is:</h3>
 							{/* map all result keys */}
 							<table>
 								<tbody>
@@ -288,6 +298,39 @@ function App() {
 										{/* item.notes is an object with fields, display it as a table */}
 										<td>
 											{Object.entries(item.notes).map(([key, value]) => (
+												<div key={key}>
+													<b>{key.toUpperCase()}</b>: {value as string}
+												</div>
+											))}
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					))}
+				{!result?.message && result?.secondaryScents && <h3>Your secondary fragrances is:</h3>}
+				{!result?.message &&
+					result?.secondaryScents?.map((item: any, index: number) => (
+						<div
+							key={index}
+							className='result'
+						>
+							{/* map all result keys */}
+							<table>
+								<tbody>
+									<tr>
+										<th>Name:</th>
+										<td>{item.name}</td>
+									</tr>
+									<tr>
+										<th>Code:</th>
+										<td>{item.code}</td>
+									</tr>
+									<tr>
+										<th>Notes</th>
+										{/* item.notes is an object with fields, display it as a table */}
+										<td>
+											{Object.entries(item?.notes)?.map(([key, value]) => (
 												<div key={key}>
 													<b>{key.toUpperCase()}</b>: {value as string}
 												</div>
