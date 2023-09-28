@@ -7,6 +7,7 @@ import './styles/index.css';
 // 	.map((set) => set.family)
 // 	.filter((value, index, self) => self.indexOf(value) === index);
 const BASE_URL = 'https://api.scentcraft.ai';
+// const BASE_URL = 'https://44ec-92-52-130-71.ngrok-free.app';
 function App() {
 	const [time, setTime] = useState('daylight');
 	const [type, setType] = useState('sexy');
@@ -123,15 +124,7 @@ function App() {
 			setResult('No results found');
 			setIsAllocation(false);
 		}
-	}, [
-		searchedFragrance?.female,
-		searchedFragrance?.family,
-		searchedFragrance?.mainAccord,
-		searchedFragrance?.description,
-		searchedFragrance?.male,
-		cards,
-		description,
-	]);
+	}, [searchedFragrance, cards, description]);
 	useEffect(() => {
 		if (!searchedFragrance) return;
 
@@ -166,7 +159,7 @@ function App() {
 	useEffect(() => {
 		if (!description) return;
 		handleSubmit();
-	}, [description, handleSubmit]);
+	}, [description]);
 	useEffect(() => {
 		handleSearch(search);
 	}, []);
